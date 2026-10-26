@@ -14,6 +14,8 @@ def env_bool(name, default=False):
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-insecure-change-me")
 DEBUG = env_bool("DJANGO_DEBUG", True)
+if not DEBUG and (not SECRET_KEY or SECRET_KEY.startswith("dev-insecure")):
+    raise RuntimeError("DJANGO_SECRET_KEY manquante en production (voir dashboard Render).")
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,testserver").split(",")
 
 # ---- Applications : projet = plusieurs apps reutilisables (Ch1) ----
@@ -36,6 +38,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Guide Render etape 2 : statics en prod
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -65,8 +68,17 @@ TEMPLATES = [
     },
 ]
 
-# ---- Base de donnees (Ch2) : SQLite en dev, PostgreSQL si variables definies ----
-if os.getenv("POSTGRES_DB"):
+# ---- Base de donnees (Ch2 + Guide Render 1.1) ----
+# Priorite : DATABASE_URL (Render Postgres interne), sinon POSTGRES_* (Docker local),
+# sinon SQLite (dev).
+if os.getenv("DATABASE_URL"):
+    try:
+        import dj_database_url
+
+        DATABASES = {"default": dj_database_url.parse(os.environ["DATABASE_URL"])}
+    except ImportError:
+        raise RuntimeError("DATABASE_URL defini mais dj-database-url non installe.")
+elif os.getenv("POSTGRES_DB"):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -128,8 +140,18 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Guide Render 1.2 : collectstatic cible
+# WhiteNoise : sert les statics compresses (prod). Dev : fichiers directs.
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+}
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+# Render : ALLOWED_HOSTS via env (nom.onrender.com ajoute dans le dashboard).
+RENDER_HOST = os.getenv("RENDER_EXTERNAL_HOSTNAME", "")
+if RENDER_HOST and RENDER_HOST not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ALLOWED_HOSTS + [RENDER_HOST]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -137,9 +159,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 IMAGEGEN_KEY = os.getenv("IMAGEGEN_KEY", "")
 
-# ---- Securite prod (Ch4 : bonnes pratiques) ----
+# ---- Securite prod (Ch4 : bonnes pratiques + Guide Render) ----
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 3600  # check --deploy : HSTS actif en prod (Render = HTTPS)
 SESSION_COOKIE_HTTPONLY = True
