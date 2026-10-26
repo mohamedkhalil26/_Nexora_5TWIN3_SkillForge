@@ -281,4 +281,36 @@ class Command(BaseCommand):
             )
             cert.fichier.save(f"certificat-{cert.code}.pdf", ContentFile(generer_certificat_pdf(cert)))
 
+        # ---- Super-apprenant demo : TOUS les quiz reussis + TOUS les certificats ----
+        champion = get_or_create_user(
+            "champion",
+            "apprenant",
+            email="champion@skillforge.tn",
+            niveau="avance",
+            objectifs="Tout maitriser : Python, Django et l'analyse de donnees",
+        )
+        for quiz in Quiz.objects.filter(actif=True):
+            if not Tentative.objects.filter(apprenant=champion, quiz=quiz).exists():
+                t = Tentative.objects.create(
+                    quiz=quiz, apprenant=champion, score=100.0, reussi=True
+                )
+                for q in quiz.questions.all():
+                    Reponse.objects.create(
+                        tentative=t, question=q, reponse_donnee=q.bonne_reponse,
+                        correct=True, points_obtenus=float(q.points),
+                    )
+                t.feedback = "Parcours parfait, visez la certification."
+                t.save(update_fields=["feedback"])
+        for comp in Competence.objects.all():
+            if not Certificat.objects.filter(apprenant=champion, competence=comp).exists():
+                cert = Certificat.objects.create(
+                    apprenant=champion, competence=comp, score_final=100.0,
+                    delivre_par=admin,
+                )
+                cert.fichier.save(
+                    f"certificat-{cert.code}.pdf",
+                    ContentFile(generer_certificat_pdf(cert)),
+                )
+        self.stdout.write(self.style.SUCCESS("Champion OK : tous quiz + tous certificats."))
+
         self.stdout.write(self.style.SUCCESS("Seed termine. Lancez : python manage.py runserver"))
