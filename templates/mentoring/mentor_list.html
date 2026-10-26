@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Mentors{% endblock %}
+{% block content %}
+<h1>Nos mentors</h1>
+{% if recommandes %}
+<h2>Recommandés pour vous (IA)</h2>
+<ul class="list-group mb-3">{% for m in recommandes %}
+<li class="list-group-item"><a href="{{ m.get_absolute_url }}">{{ m.mentor.username }}</a></li>{% endfor %}</ul>
+{% endif %}
+<div class="row">{% for m in mentors %}
+<div class="col-md-4 mb-3"><div class="card"><div class="card-body">
+<h5>{{ m.mentor.username }}</h5><p>{{ m.presentation|truncatewords:20 }}</p>
+<a class="btn btn-sm btn-primary" href="{{ m.get_absolute_url }}">Voir</a>
+</div></div></div>
+{% empty %}<p>Aucun mentor vérifié.</p>{% endfor %}</div>
+
+{% if is_paginated %}<nav aria-label="Pagination"><ul class="pagination mt-3">
+{% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a></li>{% endif %}
+<li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+{% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a></li>{% endif %}
+</ul></nav>{% endif %}
+{% endblock %}

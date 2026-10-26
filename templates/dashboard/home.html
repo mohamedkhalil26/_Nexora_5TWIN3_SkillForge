@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Mon espace{% endblock %}
+{% block content %}
+<h1>Bonjour {{ user.username }} !</h1>
+{% if user.est_apprenant %}
+<div class="alert alert-info"><strong>Coach IA :</strong> {{ insight_ia }}</div>
+<div class="row">
+<div class="col-md-4"><div class="card"><div class="card-body">
+<h5>Quiz passés</h5><p class="display-6">{{ stats.quiz_passes }}</p></div></div></div>
+<div class="col-md-4"><div class="card"><div class="card-body">
+<h5>Moyenne</h5><p class="display-6">{{ stats.moyenne }}%</p></div></div></div>
+<div class="col-md-4"><div class="card"><div class="card-body">
+<h5>Certificats</h5><p class="display-6">{{ certificats|length }}</p></div></div></div>
+</div>
+<h2 class="mt-4">Dernières tentatives</h2>
+<ul class="list-group">{% for t in tentatives %}
+<li class="list-group-item"><a href="{{ t.get_absolute_url }}">{{ t.quiz.titre }}</a> — {{ t.score }}%</li>
+{% empty %}<li class="list-group-item">Aucune tentative. <a href="{% url 'quizzes:quiz-list' %}">Passer un quiz</a></li>{% endfor %}</ul>
+{% elif user.est_mentor %}
+<h2>Mes sessions</h2>
+<ul class="list-group">{% for r in reservations %}
+<li class="list-group-item"><a href="{{ r.get_absolute_url }}">{{ r }}</a></li>
+{% empty %}<li class="list-group-item">Aucune réservation.</li>{% endfor %}</ul>
+<p class="mt-2"><a class="btn btn-primary" href="{% url 'mentoring:dispo-create' %}">Ajouter un créneau</a></p>
+{% else %}
+<h2>Plateforme</h2>
+<ul>
+<li>Utilisateurs : {{ stats.utilisateurs }} ({{ stats.apprenants }} apprenants, {{ stats.mentors }} mentors)</li>
+<li>Cours publiés : {{ stats.cours }} · Tentatives : {{ stats.tentatives }} · Réservations : {{ stats.reservations }} · Certificats : {{ stats.certificats }}</li>
+<li>Score moyen : {{ reussite|floatformat:1 }}%</li>
+</ul>
+{% endif %}
+{% endblock %}

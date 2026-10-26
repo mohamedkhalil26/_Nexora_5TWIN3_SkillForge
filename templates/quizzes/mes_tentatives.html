@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Mes tentatives{% endblock %}
+{% block content %}
+<h1>Mes tentatives</h1>
+<ul class="list-group">{% for t in tentatives %}
+<li class="list-group-item"><a href="{{ t.get_absolute_url }}">{{ t.quiz.titre }}</a> — {{ t.score }}% ({{ t.date }})</li>
+{% empty %}<li class="list-group-item">Aucune tentative.</li>{% endfor %}</ul>
+
+{% if is_paginated %}<nav aria-label="Pagination"><ul class="pagination mt-3">
+{% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a></li>{% endif %}
+<li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+{% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a></li>{% endif %}
+</ul></nav>{% endif %}
+{% endblock %}

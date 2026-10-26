@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Question{% endblock %}
+{% block content %}
+<h1>Question</h1>
+<form method="post">{% csrf_token %}{{ form.as_p }}
+<button type="button" class="btn btn-secondary mb-2" id="btn-qcm">Générer des QCM (IA)</button><br>
+<button class="btn btn-primary" type="submit">Enregistrer</button></form>
+<div id="qcm-ia" class="alert alert-light d-none mt-2"></div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('btn-qcm').addEventListener('click', async function() {
+  try {
+    const d = await SkillForge.postIA('{% url "quizzes-api:generer-questions" %}',
+      {contenu: document.getElementById('id_enonce').value, nb: 3});
+    SkillForge.showBox('qcm-ia', JSON.stringify(d.questions, null, 2));
+  } catch (e) { alert(e.message); }
+});
+</script>
+{% endblock %}

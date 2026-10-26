@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Réserver{% endblock %}
+{% block content %}
+<h1>Réserver : {{ dispo }}</h1>
+<div class="alert alert-info"><strong>Contexte IA :</strong><br>{{ fiche|linebreaks }}</div>
+<form method="post">{% csrf_token %}{{ form.as_p }}
+<button class="btn btn-primary" type="submit">Envoyer la demande</button></form>
+{% endblock %}

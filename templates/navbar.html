@@ -1,0 +1,29 @@
+<nav class="navbar">
+<div class="container-fluid">
+<a class="navbar-brand" href="{% url 'home' %}">SkillForge</a>
+<button class="theme-toggle" id="sf-theme-toggle" type="button" title="Clair / sombre" aria-label="Basculer le thème">◐</button>
+<button class="navbar-toggler" id="sf-burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="sf-nav">
+<span class="navbar-toggler-icon"></span></button>
+<div class="navbar-collapse" id="sf-nav">
+<ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="{% url 'learning:competence-list' %}">Compétences</a></li>
+<li class="nav-item"><a class="nav-link" href="{% url 'learning:cours-list' %}">Cours</a></li>
+<li class="nav-item"><a class="nav-link" href="{% url 'quizzes:quiz-list' %}">Quiz</a></li>
+<li class="nav-item"><a class="nav-link" href="{% url 'mentoring:mentor-list' %}">Mentors</a></li>
+<li class="nav-item"><a class="nav-link" href="{% url 'certification:certificat-list' %}">Certificats</a></li>
+{% if user.is_authenticated %}
+<li class="nav-item"><a class="nav-link" href="{% url 'dashboard:home' %}">Mon espace</a></li>
+{% endif %}
+</ul>
+<ul class="navbar-nav">
+{% if user.is_authenticated %}
+<li class="nav-item"><a class="nav-link" href="{% url 'accounts:profil' user.pk %}">{{ user.username }}</a></li>
+<li class="nav-item"><form class="d-inline" method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="btn btn-link nav-link" type="submit">Déconnexion</button></form></li>
+{% else %}
+<li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">Connexion</a></li>
+<li class="nav-item"><a class="nav-link" href="{% url 'accounts:register' %}">Inscription</a></li>
+{% endif %}
+</ul>
+</div>
+</div>
+</nav>

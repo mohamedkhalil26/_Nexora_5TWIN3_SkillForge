@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Supprimer{% endblock %}
+{% block content %}
+<h1>Supprimer « {{ object }} » ?</h1>
+<p class="text-danger">Les questions et tentatives liées seront supprimées aussi (CASCADE).</p>
+<form method="post">{% csrf_token %}{{ form }}
+<button class="btn btn-danger" type="submit">Confirmer</button>
+<a class="btn btn-secondary" href="{{ object.get_absolute_url }}">Annuler</a></form>
+{% endblock %}

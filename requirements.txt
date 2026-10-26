@@ -1,0 +1,10 @@
+# SkillForge — dependances (Ch1 : figees pour installations reproductibles)
+django==5.2.*
+djangorestframework==3.18.*
+python-dotenv==1.0.*
+scikit-learn==1.5.*
+Pillow==11.*
+psycopg[binary]==3.2.*
+google-generativeai==0.8.*
+requests==2.32.*
+reportlab==4.2.*

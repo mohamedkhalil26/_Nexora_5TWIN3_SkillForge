@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Inscription{% endblock %}
+{% block content %}
+<h1>Inscription</h1>
+<form method="post">{% csrf_token %}{{ form.as_p }}
+<button type="button" class="btn btn-secondary mb-2" id="btn-bio">Suggérer ma bio (IA)</button><br>
+<button class="btn btn-primary" type="submit">S'inscrire</button></form>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('btn-bio').addEventListener('click', async function() {
+  try {
+    const d = await SkillForge.postIA('{% url "accounts-api:suggerer-bio" %}', {
+      objectifs: document.getElementById('id_objectifs').value,
+      niveau: document.getElementById('id_niveau').value
+    });
+    alert(d.bio);
+  } catch (e) { alert(e.message); }
+});
+</script>
+{% endblock %}

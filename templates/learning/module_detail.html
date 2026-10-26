@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ module.titre }}{% endblock %}
+{% block content %}
+<h1>{{ module.titre }}</h1>
+<p><a href="{{ module.cours.get_absolute_url }}">← {{ module.cours.titre }}</a></p>
+<div class="card mb-3"><div class="card-body">{{ module.contenu|linebreaks }}</div></div>
+<div class="alert alert-info"><strong>Résumé IA :</strong> {{ resume_ia|truncatewords:60 }}</div>
+{% if tags %}<p><strong>Tags IA :</strong> {% for t in tags %}<span class="badge bg-secondary">{{ t }}</span> {% endfor %}</p>{% endif %}
+<h2>Ressources</h2>
+<ul class="list-group">{% for r in module.ressources.all %}
+<li class="list-group-item">{{ r.titre }} ({{ r.get_type_display }}){% if r.url %} — <a href="{{ r.url }}">ouvrir</a>{% endif %}{% if r.fichier %} — <a href="{{ r.fichier.url }}">télécharger</a>{% endif %}{% if user.is_staff or user.role == 'mentor' or user.role == 'admin' %} <span class="float-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'learning:ressource-update' r.pk %}">Modifier</a> <a class="btn btn-sm btn-outline-danger" href="{% url 'learning:ressource-delete' r.pk %}">Supprimer</a></span>{% endif %}</li>
+{% empty %}<li class="list-group-item">Aucune ressource.</li>{% endfor %}</ul>
+{% if user.is_staff or user.role == 'mentor' or user.role == 'admin' %}<p class="mt-3"><a class="btn btn-sm btn-outline-primary" href="{% url 'learning:module-update' module.pk %}">Modifier le module</a> <a class="btn btn-sm btn-outline-danger" href="{% url 'learning:module-delete' module.pk %}">Supprimer</a> <a class="btn btn-sm btn-success" href="{% url 'learning:ressource-create' %}?module={{ module.pk }}">+ Ressource</a></p>{% endif %}
+{% endblock %}

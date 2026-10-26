@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ quiz.titre }}{% if user.is_staff or user.role == 'mentor' or user.role == 'admin' %}<p class="mt-3"><a class="btn btn-sm btn-outline-primary" href="{% url 'quizzes:quiz-update' quiz.pk %}">Modifier</a> <a class="btn btn-sm btn-outline-danger" href="{% url 'quizzes:quiz-delete' quiz.pk %}">Supprimer</a> <a class="btn btn-sm btn-secondary" href="{% url 'quizzes:question-list' quiz.pk %}">Gérer les questions</a> <a class="btn btn-sm btn-success" href="{% url 'quizzes:question-create' %}">+ Question</a></p>{% endif %}
+{% endblock %}
+{% block content %}
+<h1>{{ quiz.titre }}</h1>
+<p>Cours : <a href="{{ quiz.cours.get_absolute_url }}">{{ quiz.cours.titre }}</a> · Seuil : {{ quiz.seuil_reussite }}%</p>
+{% if meilleur_score != None %}<p><strong>Mon meilleur score : {{ meilleur_score }}%</strong></p>{% endif %}
+{% if user.is_authenticated and user.est_apprenant or user.is_staff %}<a class="btn btn-primary" href="{% url 'quizzes:quiz-passer' quiz.pk %}">Passer le quiz</a>{% endif %}
+<h2 class="mt-3">Mes tentatives</h2>
+<ul>{% for t in mes_tentatives %}<li><a href="{{ t.get_absolute_url }}">{{ t.date }} — {{ t.score }}%</a></li>{% empty %}<li>Aucune.</li>{% endfor %}</ul>
+{% if user.is_staff or user.role == 'mentor' or user.role == 'admin' %}<p class="mt-3"><a class="btn btn-sm btn-outline-primary" href="{% url 'quizzes:quiz-update' quiz.pk %}">Modifier</a> <a class="btn btn-sm btn-outline-danger" href="{% url 'quizzes:quiz-delete' quiz.pk %}">Supprimer</a> <a class="btn btn-sm btn-secondary" href="{% url 'quizzes:question-list' quiz.pk %}">Gérer les questions</a> <a class="btn btn-sm btn-success" href="{% url 'quizzes:question-create' %}">+ Question</a></p>{% endif %}
+{% endblock %}

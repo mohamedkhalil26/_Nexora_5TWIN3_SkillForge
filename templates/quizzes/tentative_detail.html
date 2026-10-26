@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Résultat{% endblock %}
+{% block content %}
+<h1>{{ tentative.quiz.titre }} — {{ tentative.score }}%</h1>
+<p><strong>{{ tentative.reussi|yesno:"Réussi,À retravailler" }}</strong> · Indicateur IA : {{ risque_ia }}</p>
+<div class="alert alert-info">{{ tentative.feedback|linebreaks }}</div>
+<h2>Détail</h2>
+<ul class="list-group">{% for r in tentative.reponses.all %}
+<li class="list-group-item">{{ r.question.enonce|truncatewords:15 }} — {{ r.correct|yesno:"✓,✗" }} ({{ r.points_obtenus }} pts)</li>
+{% endfor %}</ul>
+{% endblock %}

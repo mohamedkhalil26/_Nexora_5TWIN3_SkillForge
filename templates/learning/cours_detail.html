@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ cours.titre }}{% endblock %}
+{% block content %}
+<h1>{{ cours.titre }}</h1>
+<p>{{ cours.description }}</p>
+<p><strong>Durée :</strong> {{ cours.duree_minutes }} min · <strong>Auteur :</strong> {{ cours.auteur }}</p>
+{% if user.is_authenticated %}<button type="button" class="btn btn-secondary mb-3" id="btn-desc">Générer une description (IA)</button>
+<button type="button" class="btn btn-outline-secondary mb-3" id="btn-img">Générer une cover (IA)</button>{% endif %}
+<div id="desc-ia" class="alert alert-light d-none"></div>
+<div id="img-ia" class="mb-3"></div>
+{% if user.is_staff or user.role == 'mentor' or user.role == 'admin' %}<p><a class="btn btn-sm btn-outline-primary" href="{% url 'learning:cours-update' cours.slug %}">Modifier le cours</a> <a class="btn btn-sm btn-outline-danger" href="{% url 'learning:cours-delete' cours.slug %}">Supprimer</a> <a class="btn btn-sm btn-success" href="{% url 'learning:module-create' %}">+ Module</a></p>{% endif %}
+<h2>Modules</h2>
+<ol class="list-group list-group-numbered">{% for m in modules %}
+<li class="list-group-item"><a href="{{ m.get_absolute_url }}">{{ m.titre }}</a></li>
+{% empty %}<li class="list-group-item">Aucun module.</li>{% endfor %}</ol>
+<h2 class="mt-3">Quiz</h2>
+<ul class="list-group">{% for z in quiz %}
+<li class="list-group-item"><a href="{{ z.get_absolute_url }}">{{ z.titre }}</a></li>
+{% empty %}<li class="list-group-item">Aucun quiz.</li>{% endfor %}</ul>
+{% if similaires %}<h2 class="mt-3">Cours similaires (IA)</h2>
+<ul>{% for s in similaires %}<li><a href="{{ s.get_absolute_url }}">{{ s.titre }}</a></li>{% endfor %}</ul>{% endif %}
+{% endblock %}
+{% block scripts %}
+{% if user.is_authenticated %}<script>
+document.getElementById('btn-desc').addEventListener('click', async function() {
+  try {
+    const d = await SkillForge.postIA('{% url "learning-api:generer-description" %}',
+      {titre: document.querySelector('h1').textContent});
+    SkillForge.showBox('desc-ia', d.description);
+  } catch (e) { alert(e.message); }
+});
+document.getElementById('btn-img').addEventListener('click', async function() {
+  try {
+    const d = await SkillForge.postIA('{% url "learning-api:generer-image" %}',
+      {titre: document.querySelector('h1').textContent});
+    document.getElementById('img-ia').innerHTML =
+      '<img width="300" src="' + d.image_url + '" alt="Cover IA">';
+  } catch (e) { alert(e.message); }
+});
+</script>{% endif %}
+{% endblock %}

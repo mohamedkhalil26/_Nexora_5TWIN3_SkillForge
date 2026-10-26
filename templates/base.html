@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkillForge — {% block title %}Apprendre{% endblock %}</title>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("sf-theme")||"light";}catch(e){}</script>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/skillforge.css' %}">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%23C4552B'/%3E%3C/svg%3E">
+</head>
+<body class="bg-light">
+{% include "navbar.html" %}
+<div class="sf-toasts" id="sf-toasts" aria-live="polite"></div>
+{% if messages %}<div id="sf-django-messages" class="d-none">{% for m in messages %}<div data-tags="{{ m.tags|default:'info' }}">{{ m }}</div>{% endfor %}</div>{% endif %}
+<main class="container my-4">
+{% block content %}{% endblock %}
+</main>
+{% include "footer.html" %}
+<script src="{% static 'js/skillforge.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

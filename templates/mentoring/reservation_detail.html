@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Session{% endblock %}
+{% block content %}
+<h1>Session : {{ reservation.sujet }}</h1>
+<p><strong>Statut :</strong> {{ reservation.get_statut_display }} · <strong>Quand :</strong> {{ reservation.disponibilite }}</p>
+{% if reservation.lien_visio and reservation.statut == "confirmee" %}
+<div class="card mb-3"><div class="card-body">
+<h5>Visio Jitsi intégrée</h5>
+<iframe src="{{ reservation.lien_visio }}" style="width:100%;height:480px;border:0" allow="camera; microphone; display-capture"></iframe>
+<p><a href="{{ reservation.lien_visio }}" target="_blank">Ouvrir dans un onglet</a></p>
+</div></div>
+{% endif %}
+{% if peut_confirmer %}
+<form method="post" action="{% url 'mentoring:reservation-confirmer' reservation.pk %}">
+{% csrf_token %}<button class="btn btn-success" type="submit">Confirmer (génère le lien visio)</button></form>
+{% endif %}
+<button type="button" class="btn btn-secondary mt-3" id="btn-fiche">Fiche de préparation (IA)</button>
+<div id="fiche-ia" class="alert alert-light d-none mt-2"></div>
+<h2 class="mt-3">Messages</h2>
+<ul class="list-group mb-2">{% for m in reservation.messages.all %}
+<li class="list-group-item"><strong>{{ m.auteur.username }} :</strong> {{ m.contenu }}</li>
+{% empty %}<li class="list-group-item">Aucun message.</li>{% endfor %}</ul>
+<form method="post" action="{% url 'mentoring:reservation-message' reservation.pk %}">
+{% csrf_token %}{{ form_message.as_p }}<button class="btn btn-primary" type="submit">Envoyer</button></form>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('btn-fiche').addEventListener('click', async function() {
+  try {
+    const d = await SkillForge.postIA('{% url "mentoring-api:fiche-preparation" %}',
+      {reservation_id: {{ reservation.pk }}});
+    SkillForge.showBox('fiche-ia', d.fiche);
+  } catch (e) { alert(e.message); }
+});
+</script>
+{% endblock %}

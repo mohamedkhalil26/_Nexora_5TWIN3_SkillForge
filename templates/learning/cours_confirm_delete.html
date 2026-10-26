@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Supprimer{% endblock %}
+{% block content %}
+<h1>Supprimer « {{ object }} » ?</h1>
+<form method="post">{% csrf_token %}{{ form }}
+<button class="btn btn-danger" type="submit">Confirmer</button>
+<a class="btn btn-secondary" href="{{ object.get_absolute_url }}">Annuler</a></form>
+{% endblock %}

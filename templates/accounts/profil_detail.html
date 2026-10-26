@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Profil{% endblock %}
+{% block content %}
+<h1>{{ profil.username }} <small class="text-muted">({{ profil.get_role_display }})</small></h1>
+<p><strong>E-mail :</strong> {{ profil.email }} · <strong>Niveau :</strong> {{ profil.get_niveau_display }}</p>
+{% if profil.bio %}<p>{{ profil.bio }}</p>{% endif %}
+{% if profil.objectifs %}<p><strong>Objectifs :</strong> {{ profil.objectifs }}</p>{% endif %}
+{% if recommandations %}
+<h2>Compétences recommandées pour vous (IA)</h2>
+<ul class="list-group">{% for c in recommandations %}
+<li class="list-group-item"><a href="{{ c.get_absolute_url }}">{{ c.nom }}</a></li>{% endfor %}</ul>
+{% endif %}
+<p class="mt-3"><a class="btn btn-secondary" href="{% url 'accounts:profil-update' profil.pk %}">Modifier</a></p>
+{% endblock %}

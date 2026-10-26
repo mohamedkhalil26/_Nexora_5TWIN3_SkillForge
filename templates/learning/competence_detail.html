@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ competence.nom }}{% endblock %}
+{% block content %}
+<h1>{{ competence.nom }}</h1>
+<p>{{ competence.description }}</p>
+<h2>Cours</h2>
+<ul class="list-group">{% for c in cours %}
+<li class="list-group-item"><a href="{{ c.get_absolute_url }}">{{ c.titre }}</a> — {{ c.duree_minutes }} min</li>
+{% empty %}<li class="list-group-item">Aucun cours publié.</li>{% endfor %}</ul>
+<form class="mt-3" method="post" action="{% url 'certification:certificat-demander' competence.slug %}">
+{% csrf_token %}<button class="btn btn-success" type="submit">Demander la certification</button></form>
+{% if user.is_staff or user.role == 'mentor' or user.role == 'admin' %}<p class="mt-3"><a class="btn btn-sm btn-outline-primary" href="{% url 'learning:competence-update' competence.slug %}">Modifier</a> <a class="btn btn-sm btn-outline-danger" href="{% url 'learning:competence-delete' competence.slug %}">Supprimer</a></p>{% endif %}
+{% endblock %}

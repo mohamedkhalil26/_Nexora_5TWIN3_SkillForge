@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Cours{% endblock %}
+{% block content %}
+<h1>Cours</h1>
+<form method="post">{% csrf_token %}{{ form.as_p }}
+<button class="btn btn-primary" type="submit">Enregistrer</button></form>
+{% endblock %}

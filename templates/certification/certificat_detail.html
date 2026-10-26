@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Certificat{% endblock %}
+{% block content %}
+<h1>Certificat — {{ certificat.competence.nom }}</h1>
+<p><strong>Score :</strong> {{ certificat.score_final }}% · <strong>Délivré le :</strong> {{ certificat.delivre_le }}</p>
+<p><strong>Code :</strong> {{ certificat.code }}</p>
+<div class="alert alert-success">{{ feedback_ia }}</div>
+<a class="btn btn-primary" href="{% url 'certification:certificat-pdf' certificat.pk %}">Télécharger le PDF</a>
+{% endblock %}

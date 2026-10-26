@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Questions — {{ quiz.titre }}{% endblock %}
+{% block content %}
+<h1>Questions — {{ quiz.titre }}</h1>
+<ul class="list-group">{% for q in questions %}
+<li class="list-group-item">Q{{ q.ordre }} ({{ q.get_type_display }}) — {{ q.enonce|truncatewords:15 }}
+{% if user.is_staff or user.role == "mentor" or user.role == "admin" %}<span class="float-end">
+<a class="btn btn-sm btn-outline-primary" href="{% url 'quizzes:question-update' q.pk %}">Modifier</a>
+<a class="btn btn-sm btn-outline-danger" href="{% url 'quizzes:question-delete' q.pk %}">Supprimer</a>
+</span>{% endif %}</li>
+{% empty %}<li class="list-group-item">Aucune question.</li>{% endfor %}</ul>
+{% endblock %}
