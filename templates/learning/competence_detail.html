@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}{{ competence.nom }}{% endblock %}
 {% block content %}
+{% if competence.image %}<img src="{{ competence.image.url }}" alt="Illustration de la compétence {{ competence.nom }}" style="max-width:100%;border-radius:14px;margin-bottom:1rem">{% endif %}
 <h1>{{ competence.nom }}</h1>
 <p>{{ competence.description }}</p>
 <h2>Cours</h2>

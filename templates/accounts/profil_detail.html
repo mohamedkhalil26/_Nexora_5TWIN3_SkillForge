@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Profil{% endblock %}
 {% block content %}
+{% if profil.avatar %}<img src="{{ profil.avatar.url }}" alt="Avatar de {{ profil.username }}" width="96" height="96" style="border-radius:50%;object-fit:cover">{% endif %}
 <h1>{{ profil.username }} <small class="text-muted">({{ profil.get_role_display }})</small></h1>
 <p><strong>E-mail :</strong> {{ profil.email }} · <strong>Niveau :</strong> {{ profil.get_niveau_display }}</p>
 {% if profil.bio %}<p>{{ profil.bio }}</p>{% endif %}

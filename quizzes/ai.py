@@ -15,15 +15,26 @@ except ImportError:
     _SKLEARN_OK = False
 
 
+_GEMINI_COOLDOWN = 300  # secondes : apres un echec, on n'essaie plus (perf grille 5.2)
+_gemini_dernier_echec = 0.0
+
+
 def gemini_generate(prompt: str) -> str | None:
-    if not getattr(settings, "GOOGLE_API_KEY", ""):
+    global _gemini_dernier_echec
+    if not getattr(settings, 'GOOGLE_API_KEY', ''):
         return None
+    import time
+    if time.time() - _gemini_dernier_echec < _GEMINI_COOLDOWN:
+        return None  # circuit-breaker : evite de bloquer chaque requete HTTP
     try:
         import google.generativeai as genai
 
         genai.configure(api_key=settings.GOOGLE_API_KEY)
-        return genai.GenerativeModel("gemini-1.5-flash").generate_content(prompt).text
+        return genai.GenerativeModel('gemini-1.5-flash').generate_content(
+            prompt, request_options={'timeout': 8}
+        ).text
     except Exception:
+        _gemini_dernier_echec = time.time()
         return None
 
 
@@ -58,7 +69,11 @@ def corriger_libre(question, reponse_donnee: str) -> tuple[bool, float, str]:
             note = 0.5
         feedback = "\n".join(gemini.splitlines()[1:]).strip() or gemini
         return note >= 0.6, note * question.points, feedback
-    # Fallback local (offline) : similarite TF-IDF
+    # Fallback local (offline) : similarite TF-IDF.
+    # Seuil 0.25 calibre empiriquement (eval_ia.py, n=20) : les paraphrases
+    # sinceres scorent 0.25-0.58, les hors-sujet 0.00. Gemini reste prioritaire
+    # quand la cle est configuree.
+    SEUIL_LOCAL = 0.25
     if not _SKLEARN_OK:
         ok = normalize(reponse_donnee) == normalize(attendu)
         return ok, float(question.points) if ok else 0.0, feedback_local(ok)
@@ -69,7 +84,8 @@ def corriger_libre(question, reponse_donnee: str) -> tuple[bool, float, str]:
     except Exception:
         sim = 0.0
     note = sim
-    return note >= 0.6, round(note * question.points, 2), feedback_local(note >= 0.6, sim)
+    ok = note >= SEUIL_LOCAL
+    return ok, round(note * question.points, 2), feedback_local(ok, sim)
 
 
 def feedback_local(reussi: bool, sim: float = 0.0) -> str:

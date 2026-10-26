@@ -2,15 +2,26 @@
 from django.conf import settings
 
 
+_GEMINI_COOLDOWN = 300  # secondes : apres un echec, on n'essaie plus (perf grille 5.2)
+_gemini_dernier_echec = 0.0
+
+
 def gemini_generate(prompt: str) -> str | None:
-    if not getattr(settings, "GOOGLE_API_KEY", ""):
+    global _gemini_dernier_echec
+    if not getattr(settings, 'GOOGLE_API_KEY', ''):
         return None
+    import time
+    if time.time() - _gemini_dernier_echec < _GEMINI_COOLDOWN:
+        return None  # circuit-breaker : evite de bloquer chaque requete HTTP
     try:
         import google.generativeai as genai
 
         genai.configure(api_key=settings.GOOGLE_API_KEY)
-        return genai.GenerativeModel("gemini-1.5-flash").generate_content(prompt).text
+        return genai.GenerativeModel('gemini-1.5-flash').generate_content(
+            prompt, request_options={'timeout': 8}
+        ).text
     except Exception:
+        _gemini_dernier_echec = time.time()
         return None
 
 

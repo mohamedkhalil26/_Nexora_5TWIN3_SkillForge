@@ -12,3 +12,5 @@ staticfiles/
 .env.*
 !.env.example
 .tmp_pdf/
+.coverage
+htmlcov/

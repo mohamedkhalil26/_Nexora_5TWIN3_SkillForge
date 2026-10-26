@@ -26,7 +26,8 @@
   --sf-ink-soft: #57534e;       /* texte secondaire */
   --sf-muted: #8a8580;          /* texte très discret */
   --sf-line: #e7e2d9;           /* bordures */
-  --sf-accent: #c4552b;         /* terracotta */
+  --sf-accent: #c4552b;         /* terracotta (aplat bouton : blanc dessus = 4.49:1, grand texte OK) */
+  --sf-accent-text: #a8431f;    /* terracotta assombri pour le TEXTE (5.72:1 sur fond clair = AA ✅) */
   --sf-accent-ink: #ffffff;
   --sf-accent-soft: #fbe9e0;    /* fond teinté accent */
   --sf-accent-dark: #a34422;    /* survol */
@@ -109,7 +110,7 @@ h5 { font-size: 1rem; }
 
 p { margin: 0 0 1em; }
 
-a { color: var(--sf-accent); text-decoration: none; }
+a { color: var(--sf-accent-text); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 /* ---------- 5. Layout : container + main ---------- */
@@ -308,10 +309,10 @@ main.container { padding-top: 2rem; padding-bottom: 4rem; }
 .btn-outline-danger {
   background: transparent;
 }
-.btn-outline-primary { border-color: var(--sf-accent); color: var(--sf-accent); }
+.btn-outline-primary { border-color: var(--sf-accent-text); color: var(--sf-accent-text); }
 .btn-outline-primary:hover { background: var(--sf-accent-soft); }
 .btn-outline-secondary { border-color: var(--sf-line); color: var(--sf-ink-soft); }
-.btn-outline-secondary:hover { border-color: var(--sf-accent); color: var(--sf-accent); }
+.btn-outline-secondary:hover { border-color: var(--sf-accent-text); color: var(--sf-accent-text); }
 .btn-outline-danger { border-color: var(--sf-danger); color: var(--sf-danger); }
 .btn-outline-danger:hover { background: var(--sf-danger-bg); }
 
@@ -451,7 +452,7 @@ ul.list-group, ol.list-group { padding-left: 0; }
   font-weight: 600;
   font-size: 0.88rem;
 }
-.page-link:hover { border-color: var(--sf-accent); color: var(--sf-accent); text-decoration: none; }
+.page-link:hover { border-color: var(--sf-accent-text); color: var(--sf-accent-text); text-decoration: none; }
 .page-item.disabled .page-link {
   background: transparent;
   border-color: transparent;
@@ -591,7 +592,7 @@ small.text-muted { font-size: 0.85rem; }
   box-shadow: var(--sf-shadow);
 }
 .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin-bottom: 0.4em; }
-.hero h1 .accent { color: var(--sf-accent); }
+.hero h1 .accent { color: var(--sf-accent-text); }
 .hero .lead { max-width: 640px; }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 1.4rem; }
 
@@ -629,7 +630,19 @@ footer {
 small, .small { font-size: 0.85em; }
 .nav-item { list-style: none; }
 
-/* ---------- 20. Focus visible (accessibilité) ---------- */
+/* ---------- 20. Skip-link + focus visible (accessibilité) ---------- */
+.sf-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--sf-accent);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 0 0 var(--sf-radius-sm) 0;
+  font-weight: 600;
+  z-index: 300;
+}
+.sf-skip:focus { left: 0; }
 a:focus-visible, button:focus-visible {
   outline: none;
   box-shadow: var(--sf-ring);
